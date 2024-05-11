@@ -1,0 +1,25 @@
+name: Run tests
+on: [push]
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: shellcheck scripts/*.sh
+  test:
+    needs: [lint]
+    strategy:
+      matrix:
+        buildkit-tag: ["main", "3.2"]
+        site-template-ref: ["heads/main"]
+        starter-site-ref: ["heads/main", "tags/1.8.0"]
+        allowed_failure: [false]
+    name: Buildkit ${{ matrix.buildkit-tag }} | Template ${{ matrix.site-template-ref }} | Starter ${{ matrix.starter-site-ref }}
+    uses: .github/workflows/isle-site-template.yml@main
+    permissions:
+      contents: read
+    with:
+      buildkit-tag: ${{ matrix.buildkit-tag }}
+      site-template-ref: ${{ matrix.site-template-ref }}
+      starter-site-ref: ${{ matrix.starter-site-ref }}
+    secrets: inherit
