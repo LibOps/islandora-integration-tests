@@ -1,0 +1,46 @@
+name: template+starter
+on:
+  workflow_call:
+    inputs:
+      buildkit-tag:
+        required: true
+        type: string
+        default: '3.2.3'
+      site-template-ref:
+        required: true
+        type: string
+        default: 'heads/main'
+      starter-site-ref:
+        required: true
+        type: string
+        default: 'tags/1.8.0'
+  workflow_dispatch:
+    inputs:
+      buildkit-tag:
+        description: "The isle-buildkit tag to pull for the fleet of docker containers"
+        required: true
+        type: string
+        default: '3.2.3'
+      site-template-ref:
+        description: "The isle-site-template ref to checkout (refs/BRANCH-NAME or tags/TAG-NAME)"
+        required: true
+        type: string
+        default: 'heads/main'
+      starter-site-ref:
+        description: "The islandora-starter-site ref to checkout (refs/BRANCH-NAME or tags/TAG-NAME)"
+        required: true
+        type: string
+        default: 'tags/1.8.0'
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    env:
+      ISLANDORA_TAG: "${{ github.event.inputs.buildkit-tag }}"
+      ISLE_SITE_TEMPLATE_REF: "${{ github.event.inputs.site-template-ref }}"
+      ISLANDORA_STARTER_REF: "${{ github.event.inputs.starter-site-ref }}"
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: start islandora-starter-site
+        working-directory: isle-site-template
+        run: ./scripts/init-template-starter.sh
