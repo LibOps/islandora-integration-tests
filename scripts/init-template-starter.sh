@@ -11,35 +11,25 @@ if [ ! -v ISLANDORA_STARTER_REF ] || [ "$ISLANDORA_STARTER_REF" = "" ]; then
 fi
 
 mkdir -p isle-site-template
-cd isle-site-template
+pushd "$(pwd)/isle-site-template"
+
 curl -L "https://github.com/Islandora-Devops/isle-site-template/archive/refs/${ISLE_SITE_TEMPLATE_REF}.tar.gz" \
   | tar -xz --strip-components=1
+rm -rf .github setup.sh
 
-cp drupal/rootfs/var/www/drupal/assets/patches/default_settings.txt .
+mv drupal/rootfs/var/www/drupal/assets/patches/default_settings.txt .
 
 curl -L "https://github.com/Islandora-Devops/islandora-starter-site/archive/refs/${ISLANDORA_STARTER_REF}.tar.gz" \
   | tar --strip-components=1 -C drupal/rootfs/var/www/drupal -xz
 
 mv default_settings.txt drupal/rootfs/var/www/drupal/assets/patches/default_settings.txt
 
+rm -rf certs/* secrets/*
 ./generate-certs.sh
 ./generate-secrets.sh
 
 docker compose --profile dev up -d
 
+popd
 
-COUNTER=0
-while true; do
-  HTTP_STATUS=$(curl -w '%{http_code}' -o /dev/null -s https://islandora.dev/)
-  if [ "${HTTP_STATUS}" -eq 200 ]; then
-    echo "We're live 🚀"
-    exit 0
-  fi
-  echo "Ping returned ${HTTP_STATUS}"
-  ((COUNTER++))
-  if [ "${COUNTER}" -eq 50 ]; then
-    echo "Failed to come online after 4m"
-    exit 1
-  fi
-  sleep 5;
-done
+./scripts/ping.sh
