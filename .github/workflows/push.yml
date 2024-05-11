@@ -10,12 +10,11 @@ jobs:
     needs: [lint]
     strategy:
       matrix:
-        buildkit-tag: ["main", "3.2"]
+        buildkit-tag: ["3.2"]
         site-template-ref: ["heads/main"]
-        starter-site-ref: ["heads/main", "tags/1.8.0"]
-        allowed_failure: [false]
+        starter-site-ref: ["tags/1.8.0"]
     name: Buildkit ${{ matrix.buildkit-tag }} | Template ${{ matrix.site-template-ref }} | Starter ${{ matrix.starter-site-ref }}
-    uses: .github/workflows/isle-site-template.yml@main
+    uses: ./.github/workflows/isle-site-template.yml
     permissions:
       contents: read
     with:
