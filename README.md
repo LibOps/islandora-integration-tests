@@ -4,6 +4,7 @@ Tie together [isle-buildkit](https://github.com/Islandora-Devops/isle-buildkit/)
 
 ## Overview
 
+```mermaid
 sequenceDiagram
     actor Alice
     Alice->>GitHub: git push origin feature-branch
